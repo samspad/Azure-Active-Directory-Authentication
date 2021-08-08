@@ -180,25 +180,42 @@ elseif (strcmp(session_id() , $_GET["state"]) == 0)
         "HTTP_msg" => $options
     ) , $error_email);
 
-    
-    #redirect after authentication
-    $redirect = "______enter file name here_____";
-    
-    if (isset($return_url))
+    #Debug print
+    //var_dump($groupdata);
+    $groupAry = $groupdata['value'];
+    #Azure group name validation
+    $Groupvalidation = array_search("____enter group control here______", array_column($groupAry, "displayName"));
+   // $Groupvalidation = array_search("f4e6235c-7ec5-450c-844d-5ca73db833a2", array_column($groupAry, "id"));
+
+
+    if (isset($userdata['givenName']) && ($Groupvalidation != false))
     {
-        if ($return_url != "")
-        $redirect = $return_url;
+        extract($userdata);
+        $_SESSION['email'] = $userPrincipalName;
+        $_SESSION['is_pi'] = '';
+        $_SESSION['account'] = $userPrincipalName;
+        $_SESSION['user_id'] = $userPrincipalName;
+        $_SESSION['user_name'] = $givenName;
+        $msg = "Successful Login";
+
+        #redirect after authentication
+        $redirect = "______enter file name here_____";
+        
+		if (isset($return_url))
+        {
+			if ($return_url != "")
+            $redirect = $return_url;
+        }
+
+        echo "
+
+        <script>        
+          window.location.href='../$redirect'
+        </script>
+
+        ";
+
     }
-
-    echo "
-
-    <script>        
-        window.location.href='../$redirect'
-    </script>
-
-    ";
-
-}
 
     else
     {
@@ -214,6 +231,7 @@ elseif (strcmp(session_id() , $_GET["state"]) == 0)
         ";
     }
 
+}
 else
 {
     #IMPORTANT: If you end up here, something has obviously gone wrong... Likely that the sent and returned state aren't matching and no $_GET["error"] received.
